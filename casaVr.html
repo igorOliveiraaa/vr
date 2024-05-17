@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casa VR</title>
+  <script src="./lib/aframe.min.js"></script>
+  <style>
+    body { 
+      margin: 0; 
+      font-family: Arial, sans-serif; 
+    }
+    .button-container {
+      position: absolute;
+      top: 5%;
+      left: 5%;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .button-container button {
+      padding: 15px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 25px;
+      background-color: #3498db; 
+      color: #fff; 
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s; 
+    }
+    .button-container button:hover {
+      background-color: #2980b9; 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); 
+    }
+    .button-container .active {
+      background-color: #2ecc71; 
+    }
+    .button-container .inactive {
+      background-color: #e74c3c; 
+    }
+    .fade {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      opacity: 0;
+      transition: opacity 1s;
+      pointer-events: none;
+      z-index: 10000;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button onclick="changeEnvironment('#skyTextureCozinha')">Cozinha</button>
+    <button onclick="changeEnvironment('#skyTextureSala')">Sala</button>
+    <button onclick="changeEnvironment('#skyTextureQuartoCasal')">Quarto Casal</button>
+    <button onclick="changeEnvironment('#skyTextureQuartoCriancas')">Quarto Crianças</button>
+    <button onclick="changeEnvironment('#skyTextureBanheiro')">Banheiro</button>
+    <button id="autoChangeButton" class="inactive" onclick="toggleAutoChange()">Troca Automática</button>
+  </div>
+  <div id="fade" class="fade"></div>
+  <a-scene>
+    <a-assets>
+      <img id="skyTextureCozinha" src="./img/cozinha.jpeg">
+      <img id="skyTextureSala" src="./img/sala.jpg">
+      <img id="skyTextureQuartoCasal" src="./img/quartoCasal.jpeg">
+      <img id="skyTextureQuartoCriancas" src="./img/quartoCriancas.jpg">
+      <img id="skyTextureBanheiro" src="./img/banheiro.jpeg">      
+    </a-assets>
+    <a-sky id="sky" src="#skyTextureCozinha" rotation="0 -130 0"></a-sky>
+    <a-camera look-controls="reverseTouchDrag: true"></a-camera>
+  </a-scene>
+  <script>
+    let autoChangeInterval;
+    const environments = [
+      '#skyTextureCozinha',
+      '#skyTextureSala',
+      '#skyTextureQuartoCasal',
+      '#skyTextureQuartoCriancas',
+      '#skyTextureBanheiro'
+    ];
+    let currentEnvironmentIndex = 0;
+
+    function changeEnvironment(textureId) {
+      const sky = document.getElementById('sky');
+      const fade = document.getElementById('fade');
+
+      fade.style.opacity = 1;
+      setTimeout(() => {
+        if (sky) {
+          sky.setAttribute('src', textureId);
+        } else {
+          console.error('Element with id "sky" not found');
+        }
+        fade.style.opacity = 0;
+      }, 1000);
+    }
+
+    function autoChangeEnvironment() {
+      currentEnvironmentIndex = (currentEnvironmentIndex + 1) % environments.length;
+      changeEnvironment(environments[currentEnvironmentIndex]);
+    }
+
+    function toggleAutoChange() {
+      const button = document.getElementById('autoChangeButton');
+      if (autoChangeInterval) {
+        clearInterval(autoChangeInterval);
+        autoChangeInterval = null;
+        button.classList.remove('active');
+        button.classList.add('inactive');
+      } else {
+        autoChangeInterval = setInterval(autoChangeEnvironment, 3500); 
+        button.classList.remove('inactive');
+        button.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
